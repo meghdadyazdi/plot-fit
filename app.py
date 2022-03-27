@@ -5,6 +5,7 @@ import pylab as plb
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from scipy import asarray as ar,exp
+import scipy.stats as stats
 
 app = Flask(__name__)
 
@@ -63,13 +64,17 @@ def gauss_fit(peak, area, fwhm):
     def gaus(x,a,x0,sigma):
         return a*exp(-(x-x0)**2/(2*sigma**2))
     popt,pcov = curve_fit(gaus,xdata,ydata,p0=[amp,float(peak),sigma])
-    # (amp, peak, sigma) = popt
+    (amp, peak, sigma) = popt
     yfit = gaus(xfit,*popt).tolist()
-    peak_fit = float(peak) + 2
-    area_fit = float(area) + 2
-    height_fit = 7.5
-    fwhm_fit = float(fwhm) + 2
-    chi_square = .2
+    peak_fit = xfit[yfit.index(max(yfit))]
+    area_fit = round(max(yfit)*abs(sigma) / 0.3989, 2) # 1/sqrt(2pi)
+    height_fit = round(max(yfit), 2)
+    fwhm_fit = round(2.3548*abs(sigma), 2) # 2sqrt(2ln2)
+    ydiff = [x - y for x, y in zip(ydata, yfit)]
+    ydiff2 = [x * 2 for x in ydiff]
+    sig = [1]*len(ydiff) #it should be improved
+    sig2 = [x * 2 for x in sig]
+    chi_square = round(sum([x / y for x, y in zip(ydiff2, sig2)]),2)
     return (xfit, yfit, peak_fit, area_fit, height_fit, fwhm_fit, chi_square)
 
 
