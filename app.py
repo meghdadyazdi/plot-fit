@@ -72,7 +72,7 @@ def gauss_fit(peak, area, fwhm):
     fwhm_fit = round(2.3548*abs(sigma), 2) # 2sqrt(2ln2)
     ydiff = [x - y for x, y in zip(ydata, yfit)]
     ydiff2 = [x * 2 for x in ydiff]
-    sig = [1]*len(ydiff) #it should be improved
+    sig = [1]*len(ydiff) #it can be improved
     sig2 = [x * 2 for x in sig]
     chi_square = round(sum([x / y for x, y in zip(ydiff2, sig2)]),2)
     return (xfit, yfit, peak_fit, area_fit, height_fit, fwhm_fit, chi_square)
